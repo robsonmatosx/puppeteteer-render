@@ -1,6 +1,8 @@
 const puppeteer = require("puppeteer");
 require("dotenv").config();
 
+var database = require('./database');
+
 const scrapeReview = async (res) =>{
     
 
@@ -27,6 +29,16 @@ const browser = await puppeteer.launch({
 try {
 
     var infores="";
+    var data_corte = "";
+
+    var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -1 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
+    database.query(query, function(error, data){
+        if (error) throw err;
+        console.log('data de corte definida: '+data[0]["DATA_HORA"]);
+        data_corte = data[0]["DATA_HORA"]
+    });
+  
+   
 
     for (let x = 0; x < perfis.length; x++) {
   
@@ -57,8 +69,10 @@ try {
       
           await page.goto(perfis[x]);
         //await page.screenshot({ path: 'perfil_'+x+'.png' });
-      
-        const data_corte = '2023-04-01 00:00:00';
+
+
+       
+       // const data_corte = '2023-04-01 00:00:00';
         var pageNum=0;
         var data_post = '';
         do  {
@@ -127,7 +141,9 @@ try {
           //'Loja, Produto, Data, Link_IMG, Link_produto
       
           console.log('status :'+ x +' de ' + perfis.length);
-      
+        
+          infores+=`<p>Loja avaliada: '+${perfis[x]}</p>`;
+
           data_hora.forEach(
               function(element, index, array) {
               data_post = data_hora[index];
@@ -136,30 +152,19 @@ try {
       
                 console.log('Loja avaliada: '+perfis[x]);
                 
-             if (produto[index].toLowerCase().search('convite digital')>=0 || produto[index].toLowerCase().indexOf('convite virtual')>=0 || produto[index].toLowerCase().indexOf('convite individual')>=0 || produto[index].toLowerCase().indexOf('arte digital')>=0){
+             if (produto[index].toLowerCase().search('convite digital')>=0 || produto[index].toLowerCase().indexOf('convite virtual')>=0 || produto[index].toLowerCase().indexOf('convite individual')>=0 || produto[index].toLowerCase().indexOf('arte digital')>=0 || produto[index].toLowerCase().search('convite animado')>=0){
            
               const produtoArray = produto[index].split("-");
               var codigo_produto = produto_id[index].split('/');
             
-              infores+=`<img src="${imagem[index]}" lat="${produto[index]}" />`;
+              //infores+=`<img src="${imagem[index]}" alt="${produto[index]}" />`;
               console.log(perfis[x]+'|'+produto[index]+'|'+element+'|'+imagem[index]+'|'+link_produto[index]);
               
-              //var query = "INSERT INTO  * FROM sample_data ORDER BY id DESC";
-              //var query =  "INSERT INTO elo7_novo.`Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
-            //  query= query +` VALUES ('${perfis[x]}','${produtoArray[0].replace(","," ")}','${data_hora[index]}','${imagem[index]}','${codigo_produto.at(-1)}','${link_produto[index]}','${avaliacao_lnk[index]}');`
+              var query =  "INSERT INTO db_convee60504c.`Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
+              query= query +` VALUES ('${perfis[x]}','${produtoArray[0].replace(","," ")}','${data_hora[index]}','${imagem[index]}','${codigo_produto.at(-1)}','${link_produto[index]}','${avaliacao_lnk[index]}');`
       
                      
-              
-              //database.query(query, function(error, data){
-                // response.json({
-                //   message : 'Data Added'
-                // })
-      
-              //  console.log(query);
-              //  console.log('Resultado insert no banco')
-               // console.log(error)
-              //  console.log(data)
-             // });
+              database.query(query, function(error, data){});
       
             } else {
       
@@ -168,7 +173,7 @@ try {
             
           } else {
       
-            console.log(" \u001b[1;31m Data maior do que a data de corte: "+data_post+">"+data_corte);
+            console.log(" \u001b[1;31m Data menor do que a data de corte: "+data_post+"<"+data_corte);
           }
          
          });
@@ -189,7 +194,7 @@ try {
              
             }
       
-          } while(data_post>= data_corte && data_post<='2023-12-31 00:00:00')
+          } while(data_post>= data_corte && data_post<='2030-12-31 00:00:00')
           pageNum=0;
           await page.goto('about:blank')
           await page.close();
