@@ -1,11 +1,13 @@
 const express = require("express");
 
-var server = app.listen();
-server.setTimeout(500000);
+
 
 const {scrapeLogic} =require("./scrapeLogic");
 const {scrapeReview} =require("./scrapeReview");
 const app = express();
+
+var server = app.listen();
+server.setTimeout(500000);
 
 const PORT  = process.env.PORT || 4000;
 
