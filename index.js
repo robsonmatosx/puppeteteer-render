@@ -3,7 +3,13 @@ const express = require("express");
 const {scrapeLogic} =require("./scrapeLogic");
 const {scrapeReview} =require("./scrapeReview");
 const {reviewJson} =require("./reviewJson");
+const {storeValue} =require("./storeValue");
+const {getValue} =require("./getValue");
+const bodyParser = require('body-parser');
+
 const app = express();
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 
 var server = app.listen();
 server.setTimeout(500000);
@@ -27,6 +33,14 @@ app.get("/reviewjson", (req, res)=>{
     reviewJson(req,res);
 
 });
+
+app.post("/storevalue", (req,res)=> {
+storeValue(req,res);
+});
+
+app.post("/getvalue", (req,res)=> {
+    getValue(req,res);
+    });
 
 app.listen(4000, ()=> {
     console.log(`Listening on port 4000 ${PORT}`)
