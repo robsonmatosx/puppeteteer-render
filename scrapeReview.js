@@ -31,7 +31,7 @@ try {
     var infores="";
     var data_corte = "";
 
-    var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -1 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
+    var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -5 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
     database.query(query, function(error, data){
         if (error) throw err;
         console.log('data de corte definida: '+data[0]["DATA_HORA"]);
