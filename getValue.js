@@ -35,9 +35,10 @@ const getValue =  (req,res)=> {
          
              Object.keys(data).forEach(function(key) {
                           row = data[key];
-                          console.log('Row value:'+row['VALUE']) ;           
-                          res.send(row['VALUE'])
-                          resultado = row['VALUE']
+                          console.log('Row value:'+row['VALUE']) ;  
+                          resultado = row['VALUE']         
+                          res.json({value: `${row['VALUE']}`})
+                         
                       });                               
            });
         
