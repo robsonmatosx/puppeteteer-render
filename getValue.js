@@ -13,18 +13,18 @@ const getValue =  (req,res)=> {
 
     try {
 
-    let data = req.body;
-    console.log(`params: ${JSON.stringify(data)}`)
-    console.log(data.tag)
+    let data_res = req.body;
+    console.log(`params: ${JSON.stringify(data_res)}`)
+    console.log(data_res.tag)
    // res.send('Data Received: ' + JSON.stringify(data));
-    if (data.tag =='' ) {
+    if (data_res.tag =='' ) {
       throw new Error (`{error:'${error}'}`);
     }
 
            var query = "";           
                     
            var valor_tag = async (resultado)=> {
-            query = `SELECT VALUE FROM db_convee60504c.tb_tags_app  where TAG = '${data.tag}'; `;
+            query = `SELECT VALUE FROM db_convee60504c.tb_tags_app  where TAG = '${data_res.tag}'; `;
 
            console.log(query);
            var row ="";
@@ -37,8 +37,7 @@ const getValue =  (req,res)=> {
                           row = data[key];
                           console.log('Row value:'+row['VALUE']) ;  
                           resultado = row['VALUE']         
-                          res.json({value: `${row['VALUE']}`})
-                         
+                          res.json([`VALUE`,`${data_res.tag}`,`${row['VALUE']}`]);                         
                       });                               
            });
         
@@ -48,7 +47,7 @@ const getValue =  (req,res)=> {
        
           // res.send(valor_tag())
 
-  
+  //https://linkazul-puppeteer.onrender.com
      
     } catch (e) {
         console.error(e);
