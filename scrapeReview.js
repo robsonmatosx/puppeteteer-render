@@ -159,11 +159,19 @@ try {
               //infores+=`<img src="${imagem[index]}" alt="${produto[index]}" />`;
               console.log(perfis[x]+'|'+produto[index]+'|'+element+'|'+imagem[index]+'|'+link_produto[index]);
               
-              var query =  "INSERT INTO db_convee60504c.`Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
+              var query =  "INSERT INTO `Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
               query= query +` VALUES ('${perfis[x]}','${produtoArray[0].replace(","," ")}','${data_hora[index]}','${imagem[index]}','${codigo_produto.at(-1)}','${link_produto[index]}','${avaliacao_lnk[index]}');`
       
-                     
-              database.query(query, function(error, data){});
+              
+          
+              database.query(query, function(error, data){
+              if (error) { 
+                //throw error;
+                console.log(error);
+              }else {
+             console.log(data.affectedRows + " record inserted");
+              }
+              });
       
             } else {
       
@@ -181,7 +189,7 @@ try {
       
       //console.log('carregando '+x+'/'+perfis.length);
       
-      console.log('data_hora:'+data_post );       
+          console.log('data_hora:'+data_post );       
             
               perfis.length
               console.log('Pág: '+ pageNum+'/ 51 - '+ Math.round((pageNum/51)*100)+'%');
@@ -192,6 +200,8 @@ try {
               break;
              
             }
+
+        
       
           } while(data_post>= data_corte && data_post<='2030-12-31 00:00:00')
           pageNum=0;
@@ -209,6 +219,7 @@ console.error(e);
 res.send(`Something went wrong while running Pupperteer ${e}`)
 }finally {
     await browser.close();
+    database.end(); //like this
 
 }
 

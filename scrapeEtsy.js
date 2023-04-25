@@ -176,7 +176,7 @@ try {
               //infores+=`<img src="${imagem[index]}" alt="${produto[index]}" />`;
               console.log(perfis[x]+'|'+produto[index]+'|'+element+'|'+imagem[index]+'|'+link_produto[index]);
               
-              var query =  "INSERT INTO elo7_novo.`Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
+              var query =  "INSERT INTO `Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
               query= query +` VALUES ('${perfis[x]}','${produtoArray}','${data_post}','${imagem[index]}','${produto_id[index]}','${link_produto[index]}','');`
       
                      
@@ -240,7 +240,8 @@ console.error(e);
 res.send(`Something went wrong while running Pupperteer ${e}`)
 }finally {
     await browser.close();
-
+  database.end();
+  res.send(`Processo finalizado!`);
 }
 
 }
