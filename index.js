@@ -2,6 +2,7 @@ const express = require("express");
 
 const {scrapeLogic} =require("./scrapeLogic");
 const {scrapeReview} =require("./scrapeReview");
+const {scrapeEtsy} =require("./scrapeEtsy");
 const {reviewJson} =require("./reviewJson");
 const {storeValue} =require("./storeValue");
 const {getValue} =require("./getValue");
@@ -25,6 +26,10 @@ app.get("/scrape", (req, res)=>{
 })
 app.get("/scrapereview", (req, res)=>{
     scrapeReview(res);
+})
+
+app.get("/scrapeetsy", (req, res)=>{
+    scrapeEtsy(res);
 })
 
 app.get("/reviewjson", (req, res)=>{
