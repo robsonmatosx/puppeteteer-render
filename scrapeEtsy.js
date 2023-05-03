@@ -40,7 +40,7 @@ try {
     for (let x = 0; x < perfis.length; x++) {
   
         const page = await browser.newPage();
-      
+       
         await page.setRequestInterception(true);  
            // Array of third-party domains to block
            const blockedDomains = [

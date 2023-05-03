@@ -83,6 +83,7 @@ try {
           } catch (error) {
             console.log(`Página ${ perfis[x]} não existe ou trocou de nome`);
             //console.log(error + perfis[x])
+            
           }
          
           try {
@@ -199,14 +200,12 @@ try {
       
               break;
              
-            }
-
-        
+            }        
       
           } while(data_post>= data_corte && data_post<='2030-12-31 00:00:00')
           pageNum=0;
-          await page.goto('about:blank')
-          await page.close();
+          //await page.goto('about:blank')
+         // await page.close();
       }
 
   // Print the full title
