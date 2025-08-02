@@ -30,9 +30,9 @@ try {
     var infores="";
     var data_corte = "";
 
-    var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -5 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
+    var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -25 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
     database.query(query, function(error, data){
-        if (error) throw err;
+        if (error) throw error;
         console.log('data de corte definida: '+data[0]["DATA_HORA"]);
         data_corte = data[0]["DATA_HORA"]
     });
@@ -63,13 +63,11 @@ try {
             }
           });
           
-            await page.setDefaultNavigationTimeout(0); 
+          await page.setDefaultNavigationTimeout(0); 
       
       
           await page.goto(perfis[x]);
         //await page.screenshot({ path: 'perfil_'+x+'.png' });
-
-
        
        // const data_corte = '2023-04-01 00:00:00';
         var pageNum=0;
