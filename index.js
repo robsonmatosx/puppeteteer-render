@@ -41,7 +41,7 @@ app.set('view engine', 'ejs');
 var server = app.listen();
 server.setTimeout(500000);
 
-const PORT  = process.env.PORT || 4000;
+
 
 
 app.use('/', require('./routes/login'));
@@ -99,6 +99,7 @@ app.post("/getvalue", (req,res)=> {
     getValue(req,res);
     });
 
-app.listen(4000, ()=> {
-    console.log(`Listening on port 4000 ${PORT}`)
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+    console.log(`✅ Server is listening on port ${PORT}`);
 });
