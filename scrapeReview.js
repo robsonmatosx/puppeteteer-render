@@ -14,6 +14,8 @@ const scrapeReview = async (res) =>{
     let perfis = data;
 
 
+//PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+
 const browser = await puppeteer.launch({
      args: [
     '--no-sandbox',
@@ -25,9 +27,9 @@ const browser = await puppeteer.launch({
     '--disable-dev-tools',         // Optional
     '--remote-debugging-port=0'    // Avoids opening a visible port
   ],
-    executablePath: process.env.NODE_ENV === 'production' ?
-    process.env.PUPPETEER_EXECUTABLE_PATH 
-    : puppeteer.executablePath(),
+    // executablePath: process.env.NODE_ENV === 'production' ?
+    // process.env.PUPPETEER_EXECUTABLE_PATH 
+    // : puppeteer.executablePath(),
 });
 try {
 
