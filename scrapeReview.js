@@ -16,21 +16,36 @@ const scrapeReview = async (res) =>{
 
 //PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
+// const browser = await puppeteer.launch({
+//      args: [
+//     '--no-sandbox',
+//     '--disable-setuid-sandbox',
+//     '--disable-dev-shm-usage',
+//     '--disable-gpu',
+//     '--no-zygote',
+//     '--single-process',
+//     '--disable-dev-tools',         // Optional
+//     '--remote-debugging-port=0'    // Avoids opening a visible port
+//   ],
+//     executablePath: process.env.NODE_ENV === 'production' ?
+//     process.env.PUPPETEER_EXECUTABLE_PATH 
+//     : puppeteer.executablePath(),
+// });
+
 const browser = await puppeteer.launch({
-     args: [
+  headless: true,
+  args: [
     '--no-sandbox',
     '--disable-setuid-sandbox',
     '--disable-dev-shm-usage',
     '--disable-gpu',
     '--no-zygote',
     '--single-process',
-    '--disable-dev-tools',         // Optional
-    '--remote-debugging-port=0'    // Avoids opening a visible port
-  ],
-    // executablePath: process.env.NODE_ENV === 'production' ?
-    // process.env.PUPPETEER_EXECUTABLE_PATH 
-    // : puppeteer.executablePath(),
+    '--disable-dev-tools',
+    '--remote-debugging-port=0'
+  ]
 });
+
 try {
 
     var infores="";
