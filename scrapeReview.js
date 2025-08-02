@@ -15,12 +15,16 @@ const scrapeReview = async (res) =>{
 
 
 const browser = await puppeteer.launch({
-    args: [
-        "--diable-setuid-sandbox",
-        "--no-sandbox",
-        "--single-process",
-        "--no-zygote",
-    ],
+     args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--no-zygote',
+    '--single-process',
+    '--disable-dev-tools',         // Optional
+    '--remote-debugging-port=0'    // Avoids opening a visible port
+  ],
     executablePath: process.env.NODE_ENV === 'production' ?
     process.env.PUPPETEER_EXECUTABLE_PATH 
     : puppeteer.executablePath(),
