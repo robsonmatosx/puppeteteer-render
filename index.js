@@ -1,3 +1,5 @@
+process.env['REMOTE_DEBUGGING_PORT'] = '0';
+
 const express = require("express");
 
 const {scrapeLogic} =require("./scrapeLogic");
