@@ -22,5 +22,6 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "req-flash": "^0.0.3",
     "xml2js": "^0.6.2"
+
   }
 }

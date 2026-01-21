@@ -12,6 +12,7 @@ const {scrapeBusca} =require("./scrapeBusca");
 const {storeValue} =require("./storeValue");
 const {getValue} =require("./getValue");
 const {chatBot} =require("./chatBot");
+const {scrapeUrl} =require("./scrapeurl");
 
 // var cookieParser = require('cookie-parser');
 var session      = require('express-session');
@@ -46,6 +47,7 @@ server.setTimeout(500000);
 
 app.use('/', require('./routes/login'));
 
+
 // app.get("/", (req, res) => {
 //     res.send("Render Puppetter server is up and running")
 // })
@@ -62,9 +64,9 @@ app.get("/chatbot", (req, res)=>{
 
 })
 
-app.get("/scrape", (req, res)=>{
-    scrapeLogic(res);
-})
+// app.get("/scrape", (req, res)=>{
+//     scrapeLogic(res);
+// })
 app.get("/scrapereview", (req, res)=>{
     scrapeReview(res);
 })
@@ -98,6 +100,21 @@ storeValue(req,res);
 app.post("/getvalue", (req,res)=> {
     getValue(req,res);
     });
+
+app.post('/scrapeurl', (req, res) => {
+    // Access the POST data here
+    const userData = req.body; 
+    console.log(userData);
+    //  res.render('./scrape', {
+    //     msg:userData
+    // });
+    scrapeUrl(userData, res);
+    
+    
+});
+
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
