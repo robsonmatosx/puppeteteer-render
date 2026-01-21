@@ -246,11 +246,22 @@ try {
   //const logStatement = `The title of this blog post is ${fullTitle}`
   //console.log(logStatement);
 
-  res.send (JSON.stringify({ message: 'Scraping completed successfully', data: infores , status: 'success' }));
+  res.json({
+  message: 'Scraping completed successfully',
+  data: infores,
+  status: 'success'
+}); 
+
 }
 catch(e) {
 console.error(e);
 res.send (JSON.stringify({ message: 'Scraping failed with error', error: e, status: 'error' }));
+
+  res.json({
+  message: 'Scraping failed with error',
+  error: e,
+  status: 'error'
+}); 
 }finally {
     await browser.close();
     // database.end(); // Removed to keep connection open
