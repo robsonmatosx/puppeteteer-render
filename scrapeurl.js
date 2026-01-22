@@ -181,6 +181,7 @@ try {
         
           infores+=`<p>Loja avaliada: '+${perfis[x]}</p>`;
 
+          let shouldBreak = false;
           data_hora.forEach(  
               function(element, index, array) {
               data_post = data_hora[index];
@@ -203,9 +204,9 @@ try {
               database.query(query, function(error, data){
               if (error) { 
                 //throw error;
-                console.log(error);
+                  console.log(error);
               }else {
-             console.log(data.affectedRows + " record inserted");
+                  console.log(data.affectedRows + " record inserted");
               }
               });
       
@@ -217,12 +218,19 @@ try {
           } else {
       
             console.log(" \u001b[1;31m Data menor do que a data de corte: "+data_post+"<"+data_corte);
+             shouldBreak = true;
           }
          
          });
+       
 
          infores+="<br>";
       
+
+            
+          if (shouldBreak) {
+            break;
+          }
       //console.log('carregando '+x+'/'+perfis.length);
       
           console.log('data_hora:'+data_post );       
