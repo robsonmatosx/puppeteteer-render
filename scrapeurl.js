@@ -13,6 +13,7 @@ var database = require('./database');
     console.log(userData.url);
 
     let perfis =[userData.url];
+    const data_corte = [userData.data_corte];
 
 //PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
@@ -49,33 +50,33 @@ const browser = await puppeteer.launch({
 try {
 
     var infores="";
-    var data_corte = "";
+  
 
-    var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -25 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
+    // var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -25 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
     
-    if (database.state === 'disconnected') {
-        database.connect(function(error){
-            if(error) {
-                throw error;
-            } else {
-                console.log('MySQL Database is connected Successfully');
-                 database.query(query, function(error, data){
-                if (error) throw error;
-                console.log('data de corte definida: '+data[0]["DATA_HORA"]);
-                data_corte = data[0]["DATA_HORA"];
-                    });
-            }
-    
-   
-    });
-  } else {
-     database.query(query, function(error, data){
-                if (error) throw error;
-                console.log('data de corte definida: '+data[0]["DATA_HORA"]);
-                data_corte = data[0]["DATA_HORA"];
-                    });
-  }
-   
+    // if (database.state === 'disconnected') {
+    //         database.connect(function(error){
+    //             if(error) {
+    //                 throw error;
+    //             } else {
+    //                 console.log('MySQL Database is connected Successfully');
+    //                 database.query(query, function(error, data){
+    //                 if (error) throw error;
+    //                 console.log('data de corte definida: '+data[0]["DATA_HORA"]);
+    //                 data_corte = data[0]["DATA_HORA"];
+    //                     });
+    //             }
+        
+      
+    //     });
+    //   } else {
+    //     database.query(query, function(error, data){
+    //                 if (error) throw error;
+    //                 console.log('data de corte definida: '+data[0]["DATA_HORA"]);
+    //                 data_corte = data[0]["DATA_HORA"];
+    //                     });
+    //   }
+      
 
     for (let x = 0; x < perfis.length; x++) {
   
