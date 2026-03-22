@@ -3,7 +3,7 @@ require("dotenv").config();
 
 const scrapeUrl = async (userData, res) =>{  
 
-var database = require('./database');
+    var database = require('./database');
 
     const path = require('path')
     const fsPromises = require('fs/promises')
@@ -200,7 +200,8 @@ try {
               
               var query =  "INSERT INTO `Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
               query= query +` VALUES ('${perfis[x]}','${produtoArray[0].replace(","," ")}','${data_hora[index]}','${imagem[index]}','${codigo_produto.at(-1)}','${link_produto[index]}','${avaliacao_lnk[index]}');`
-      
+
+               console.log(query);
               database.query(query, function(error, data){
               if (error) { 
                 //throw error;
