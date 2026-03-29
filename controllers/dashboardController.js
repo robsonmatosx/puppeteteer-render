@@ -53,11 +53,7 @@ const dashboardView = async (req, res) => {
             query(sqlLojas)
         ]);
 
-        console.log("Dados do status:", resStatus);
-        console.log("Dados do top15:", resTop15);
-       
-
-            res.render('dashboard', { 
+        res.render('dashboard', { 
             produtos: resStatus, 
             top15: resTop15 
         });

@@ -1,38 +1,45 @@
-
 const mysql = require('mysql');
-// const mysql = require('mysql2');
 require("dotenv").config();
 
-var connection = mysql.createConnection({
-	host : process.env.DB_HOST,
-    port:  process.env.DB_PORT,
-	database : process.env.DB,
-	user : process.env.DB_USER,
-	password : process.env.DB_PASS
-});
+const dbConfig = {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    // ADICIONE ISSO: O Render exige SSL para conexões externas
+    ssl: {
+        rejectUnauthorized: false
+    }
+};
 
-// const pool = mysql.createPool({
-//   host : process.env.DB_HOST,	
-//     port:  process.env.DB_PORT,
-// 	database : process.env.DB,
-// 	user : process.env.DB_USER,
-// 	password : process.env.DB_PASS,
-//   waitForConnections: true,
-//   connectionLimit: 10, // Max simultaneous connections
-//   queueLimit: 0
-// });
+let connection;
 
-connection.connect(function(error){
-	if(error)
-	{
-		throw error;
-	}
-	else
-	{
-		console.log('MySQL Database is connected Successfully');
-	}
-});
+function handleDisconnect() {
+    connection = mysql.createConnection(dbConfig);
 
+    connection.connect(function(err) {
+        if (err) {
+            console.log('Erro ao conectar:', err);
+            setTimeout(handleDisconnect, 2000); // Tenta reconectar em 2s
+        } else {
+            console.log('MySQL Conectado com Sucesso!');
+        }
+    });
+
+    connection.on('error', function(err) {
+        console.log('Erro no banco (db error):', err);
+        if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.fatal) {
+            handleDisconnect(); // Reconecta se a conexão cair
+        } else {
+            throw err;
+        }
+    });
+}
+
+handleDisconnect();
+
+// Ajuste na função query para usar a conexão sempre "fresca"
 const query = (sql, params) => {
     return new Promise((resolve, reject) => {
         connection.query(sql, params, (err, results) => {
@@ -42,5 +49,7 @@ const query = (sql, params) => {
     });
 };
 
-module.exports = { connection, query };
-// module.exports = pool.promise(); 
+module.exports = { 
+    get connection() { return connection; }, // Exporta a referência atualizada
+    query 
+};
