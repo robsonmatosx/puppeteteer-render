@@ -210,7 +210,7 @@ try {
                console.log(query);
 
               // sent this to flow webhook to trigger flow
-              await fetch('https://flow.linkazul.space/webhook-test/salvalinha', {
+              await fetch('https://flow.linkazul.space/webhook/salvalinha', {
                 method: 'POST',  
                 headers: {
                   'Content-Type': 'application/json'
