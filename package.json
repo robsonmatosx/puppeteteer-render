@@ -14,7 +14,7 @@
     "dotenv": "^16.0.3",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
-    "express-session": "^1.18.0",
+    "express-session": "^1.19.0",
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
     "puppeteer": "^19.8.5",
@@ -22,6 +22,5 @@
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "req-flash": "^0.0.3",
     "xml2js": "^0.6.2"
-
   }
 }

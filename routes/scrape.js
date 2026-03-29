@@ -3,4 +3,6 @@ const {scrapeViewPage } = require('../controllers/scrapeController');
 const router = express.Router();
 router.get('/scrapeurl', scrapeViewPage);
 
+router.get('/scrapeurl', scrapeViewPage);
+
 module.exports = router;

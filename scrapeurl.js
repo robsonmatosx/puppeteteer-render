@@ -15,6 +15,12 @@ const scrapeUrl = async (userData, res) =>{
     let perfis =[userData.url];
     const data_corte = [userData.data_corte];
 
+    if (data_corte == '' || data_corte == undefined || data_corte == null) {
+        data_corte = new Date();
+        data_corte.setDate(data_corte.getDate() - 30);
+        data_corte = data_corte.toISOString().slice(0, 19).replace('T', ' '); 
+    }
+
 //PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 // const browser = await puppeteer.launch({
@@ -183,12 +189,12 @@ try {
 
           let shouldBreak = false;
           data_hora.forEach(  
-              function(element, index, array) {
+              async function(element, index, array) {
               data_post = data_hora[index];
               
               if (data_post>=data_corte) {
       
-                console.log('Loja avaliada: '+perfis[x]);
+              console.log('Loja avaliada: '+perfis[x]);
                 
              if (produto[index].toLowerCase().search('convite digital')>=0 || produto[index].toLowerCase().indexOf('convite virtual')>=0 || produto[index].toLowerCase().indexOf('convite individual')>=0 || produto[index].toLowerCase().indexOf('arte digital')>=0 || produto[index].toLowerCase().search('convite animado')>=0){
            
@@ -202,18 +208,42 @@ try {
               query= query +` VALUES ('${perfis[x]}','${produtoArray[0].replace(","," ")}','${data_hora[index]}','${imagem[index]}','${codigo_produto.at(-1)}','${link_produto[index]}','${avaliacao_lnk[index]}');`
 
                console.log(query);
-              database.query(query, function(error, data){
-              if (error) { 
-                //throw error;
-                  console.log(error);
-              }else {
-                  console.log(data.affectedRows + " record inserted");
-              }
+
+              // sent this to flow webhook to trigger flow
+              await fetch('https://flow.linkazul.space/webhook-test/salvalinha', {
+                method: 'POST',  
+                headers: {
+                  'Content-Type': 'application/json'
+                }, 
+                body: JSON.stringify({ query })
               });
+      
+
+              // database.query(query, function(error, data){
+              // if (error) { 
+              //   //throw error;
+              //     console.log(error);
+              // }else {
+              //     console.log(data.affectedRows + " record inserted");
+              // }
+              // });
       
             } else {
       
             console.log(" \u001b[1;31m descartado: "+produto[index]);
+
+            query = `INSERT INTO descartados (LOJA,PRODUTO,DATA_HORA,MOTIVO) VALUES ('${perfis[x]}','${produto[index]}','${data_hora[index]}','Produto não é convite digital');`
+
+           
+
+             // sent this to flow webhook to trigger flow
+              await fetch('https://flow.linkazul.space/webhook/salvalinha', {
+                method: 'POST',  
+                headers: {
+                  'Content-Type': 'application/json'
+                }, 
+                body: JSON.stringify({ query })
+              });
             }
             
           } else {

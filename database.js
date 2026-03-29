@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
 });
 
 // const pool = mysql.createPool({
-//   host : process.env.DB_HOST,
+//   host : process.env.DB_HOST,	
 //     port:  process.env.DB_PORT,
 // 	database : process.env.DB,
 // 	user : process.env.DB_USER,
@@ -33,5 +33,14 @@ connection.connect(function(error){
 	}
 });
 
-module.exports = connection;
+const query = (sql, params) => {
+    return new Promise((resolve, reject) => {
+        connection.query(sql, params, (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+        });
+    });
+};
+
+module.exports = { connection, query };
 // module.exports = pool.promise(); 

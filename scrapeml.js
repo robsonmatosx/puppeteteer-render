@@ -4,29 +4,38 @@ require("dotenv").config();
 
 var moment = require('moment');
 
-var database = require('./database');
+// var database = require('./database');
 
-const scrapeML = async (res) =>{  
+const scrapeML = async (userData, res) =>{  
 
+    var database = require('./database');
+    console.log('link para rodar:'+userData.url);
+    let perfis =[userData.url];
+   // const data_corte = [userData.data_corte];
 
-    const path = require('path')
-    const fsPromises = require('fs/promises')
-    const filePath = path.resolve(__dirname, './listas/mercadolivre.json');
-    const data = require(filePath);
-    
-    let perfis = data;
+  //  curl -X POST http://localhost:4000/scrapeml \
+  // -H "Content-Type: application/json" \
+  // -d '{"url":"https://lista.mercadolivre.com.br/_CustId_139023013"}'
 
 const browser = await puppeteer.launch({
-      headless: false,
-      args: ['--use-gl=egl'],
-    executablePath: process.env.NODE_ENV === 'production' ?
-    process.env.PUPPETEER_EXECUTABLE_PATH 
-    : puppeteer.executablePath(),
+  headless: true,
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-gpu',
+    '--no-zygote',
+    '--single-process',
+    '--disable-dev-tools',
+    '--remote-debugging-port=0'
+  ]
 });
+
 try {
 
     var infores="";
     var data_corte = "";
+    var pendingQueries = [];
 
     // var query = 'SELECT  CASE WHEN  MAX(DATA_HORA) IS NULL THEN  DATE_FORMAT(DATE_FORMAT(now(),"%Y-%m-01"),"%Y-%m-%d %H:%i:%s") ELSE DATE_FORMAT(date_add( MAX(DATA_HORA) , INTERVAL -60 DAY),"%Y-%m-%d %H:%i:%s") END DATA_HORA FROM `Output` o;';
     // database.query(query, function(error, data){
@@ -35,13 +44,27 @@ try {
     //     data_corte = data[0]["DATA_HORA"]
     // });
   
-   data_corte = '2023-07-26 00:00:00';
+   data_corte = '2025-07-26 00:00:00';
 
     for (let x = 0; x < perfis.length; x++) {
       
       console.log(`Navegando para ${perfis[x]}`);
+
   
         const page = await browser.newPage();
+
+      await page.setUserAgent(
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+          'AppleWebKit/537.36 (KHTML, like Gecko) ' +
+          'Chrome/120.0.0.0 Safari/537.36'
+        );
+  
+        await page.setViewport({
+          width: 1366,
+          height: 768,
+          deviceScaleFactor: 1
+        });
+
        
         await page.setRequestInterception(true);  
            // Array of third-party domains to block
@@ -59,8 +82,7 @@ try {
             'https://ct.pinterest.com/',
             'https://http2.mlstatic.com/',
             'https://js-agent.newrelic.com/'
-
-          ];
+                    ];
         
           page.on('request', (req) => {
             const url = req.url();
@@ -71,54 +93,71 @@ try {
             }
           });
           
-            await page.setDefaultNavigationTimeout(); 
-      
-      
-            await page.goto(perfis[x], {waitUntil: 'domcontentloaded'});
-            await page.waitForFunction(() => document.readyState === "complete");
+        await page.setDefaultNavigationTimeout(); 
+  
+        await page.goto(perfis[x], 
+          // waitUntil: 'domcontentloaded'},
+            {waitUntil: 'networkidle2'}
+        );
+        await page.waitForFunction(() => document.readyState === "complete");
 
-
-       
        // const data_corte = '2023-04-01 00:00:00';
-        var pageNum=0;
+        var pageNum=1;
         var maxpage=0;
         var data_post = '';
         var paginaAtual=perfis[x];
 
-          
-        do  { 
+        var id_loja = perfis[x].split('_CustId_')[1];
 
-         
+        console.log(`Iniciando coleta de dados da loja: ${id_loja} a partir da data: ${data_corte}`);
+          
+        do  {         
       
           // await page.screenshot({ path: 'perfil_'+pageNum+'.png', fullPage: true });
 
-          const el = await page.$('.andes-pagination__arrow-title');
-            // await el.screenshot({
-            //   path: 'box.png'
-            // })
-
-        
-         if (pageNum>0) {
-           // await page.waitForNavigation({waitUntil: 'domcontentloaded'});
-          const next = await page.evaluate(() => Array.from(document.querySelectorAll('span.andes-pagination__arrow-title'), element => element.parentElement.href));
-          
-          console.dir(next[0]);          
          
-          paginaAtual='';
 
-          console.log(`Página atual: ${pageNum}`);
-
-       
+          maxpage = await page.evaluate(() => {
+            const pageElements = document.querySelector('.ui-search-search-result__quantity-results');
+            return Math.ceil(parseInt(pageElements.textContent.trim().split(' ')[0]) / 48);
+          }
+          );
+        
+         if (pageNum>=1) {
+           // await page.waitForNavigation({waitUntil: 'domcontentloaded'});
+          // const next = await page.evaluate(() => Array.from(document.querySelectorAll('span.andes-pagination__arrow-title'), element => element.parentElement.href));
+          
 
           try {
             
             // var next = document.getElementsByClassName('andes-pagination__arrow-title');
+
+            // _Desde_49
             
-            paginaAtual = (next.length==1 && pageNum==1)? next[0]:next[1] ;
-            console.log(`pagina seguinte encontrada ${paginaAtual}`);
+            //paginaAtual = (next.length==1 && pageNum==1)? next[0]:next[1] ;
+            if (pageNum==1) {
+              paginaAtual = 'https://lista.mercadolivre.com.br/' + '_CustId_' + id_loja;
+               console.log(` Abrindo pagina ${pageNum} -  ${paginaAtual}`);
+
+           
+            } else {
+                paginaAtual = 'https://lista.mercadolivre.com.br/' + '_Desde_' + ((pageNum-1)*48+1) + '_CustId_' + id_loja;
+               console.log(` Abrindo pagina ${pageNum} -  ${paginaAtual}`);
+          
+            }
+          
             
             await page.goto(paginaAtual);
             infores+=`<p>paginaAtual: '+${paginaAtual}</p>`;
+            console.log(`Abrindo pagina: ${pageNum} - ${paginaAtual}`);
+            
+             var nome_id  = (pageNum==1) ? '_CustId_' + id_loja : '_Desde_' + ((pageNum-1)*48+1) + '_CustId_' + id_loja;
+
+          await page.screenshot({
+             path: `screenshots/${nome_id}.png`,
+              fullPage: true
+            });
+
             
           } catch (error) {
             console.log(`Não foi localizado mais página de produto. Saindo para outra loja`);
@@ -126,8 +165,7 @@ try {
             break;
           }
         
-        }
-         
+        }         
           // try {
       
           //   await page.waitForSelector('div.content',{
@@ -137,13 +175,11 @@ try {
           //     const uiElement = document.querySelector('div.content');
           //     return uiElement.textContent;
           //   });
-      
             
           // } catch (error) {
           //   console.log('fim da página');
           //   break;
           // }
-      
           
           //console.log(text);
           // if (text=='Agora não'){
@@ -152,7 +188,34 @@ try {
           // }
           await page.waitForTimeout(500);
 
-          const produto = await page.evaluate(() => Array.from(document.querySelectorAll('div[data-region="listing"]>div>div>div>a'), element => element.ariaLabel));
+         
+ 
+           const el = await page.$$('.ui-search-layout > li');
+           console.log(`Número de produtos na página: ${el.length}`);
+
+          for (let i = 0; i < el.length; i++) {
+            const element = el[i];
+            const produtoTitle = await element.$eval('h3 > a', node => node.textContent.trim());
+            console.log(`Produto ${i + 1}: ${produtoTitle}`);
+            
+            const produtoImage = await element.$eval('img'  , node => node.src);
+            console.log(`Produto ${i + 1}: ${produtoImage}`);
+
+            const produtoLink = await element.$eval('h3 > a'  , node => node.href);
+            console.log(`Produto ${i + 1}: ${produtoLink}`);
+
+            const produtoSold = await element.$eval('.poly-component__review-compacted > span', node => node);
+           produtoSold =  produtoSold.length ==2 ? element.querySelectorAll('.poly-component__review-compacted > span')[1].textContent : 
+            element.querySelector('.poly-component__review-compacted > span').textContent
+
+            console.log(`Produto ${i + 1} vendido: ${produtoSold}`);
+          }
+
+
+          await page.waitForTimeout(1000);
+
+
+          const produto = await page.evaluate(() => Array.from(document.querySelectorAll('.ui-search-layout > li h3 > a'), element => element.textContent.trim()));
           const data_hora = await page.evaluate(() => Array.from(document.querySelectorAll('p.shop2-review-attribution'), element => element.lastChild.textContent.trim().replace('a ','').replaceAll(' de ','-')));
           const imagem = await page.evaluate(() => Array.from(document.querySelectorAll('div[data-region="listing"]>div>div>div>a img.listing-image'), element => element.src));
           const link_produto = await page.evaluate(() => Array.from(document.querySelectorAll('div[data-region="listing"]>div>div>div>a'), element => element.href));
@@ -160,8 +223,7 @@ try {
           const produto_id = await page.evaluate(() => Array.from(document.querySelectorAll('div[data-region="listing"]>div>div>div>a'), element => element.href.replace('https://www.etsy.com/listing/','').split('/')[0]));
           const pag = await page.evaluate(() => Array.from(document.querySelectorAll('div.reviews-total'), element => element.children[2].textContent));
           
-
-      
+          // console.log('Titulo: '+produto);
 
           function at(n) {
             // ToInteger() abstract op
@@ -215,11 +277,18 @@ try {
               var query =  "INSERT INTO `Output` (LOJA,PRODUTO,DATA_HORA,LINK_IMG,PRODUTO_ID,LINK_PRODUTO,LINK_AVALIACAO)";
               query= query +` VALUES ('${perfis[x]}','${produtoArray}','${data_post}','${imagem[index]}','${produto_id[index]}','${link_produto[index]}','');`
       
-                     
-              database.query(query, function(error, data){
-                    console.log(error);
-
+              // Wrap query in a promise and add to pending queries array
+              const queryPromise = new Promise((resolve, reject) => {
+                database.query(query, function(error, data){
+                  if (error) {
+                    console.log('Database error:', error);
+                    reject(error);
+                  } else {
+                    resolve(data);
+                  }
+                });
               });
+              pendingQueries.push(queryPromise);
       
             } else {
       
@@ -242,16 +311,19 @@ try {
               perfis.length
               console.log('Pág: '+ pageNum+'/ 51 - '+ Math.round((pageNum/51)*100)+'%');
               console.log('Lojas : '+ x+'/'+(perfis.length-1) + ' - ' +  Math.round((x/(perfis.length-1))*100)+'%');
-            if (pageNum>50) {
+            if (pageNum>50 || paginaAtual=='' || pageNum>maxpage) {
               console.log('Saindo forçado de loop infinito');
       
               break;
              
+            } else
+            {
+              pageNum+=1;
             }
             
-            pageNum++;
-            console.log(paginaAtual!='');
-          } while(paginaAtual!='')
+            
+            console.log(paginaAtual!='' );
+          } while(pageNum<=maxpage && paginaAtual!='');
           //pageNum=0;
           await page.goto('about:blank')
           await page.close();
@@ -260,15 +332,31 @@ try {
   // Print the full title
   //const logStatement = `The title of this blog post is ${fullTitle}`
   //console.log(logStatement);
-  res.send (infores);   
+  // res.send (infores);   
 }
 catch(e) {
 console.error(e);
 res.send(`Something went wrong while running Pupperteer ${e}`)
 }finally {
     await browser.close();
-  database.end();
-  res.send(`Processo finalizado!`);
+    // Wait for all pending database queries to complete before closing connection
+    try {
+      if (pendingQueries.length > 0) {
+        await Promise.all(pendingQueries);
+      }
+    } catch (error) {
+      console.error('Error waiting for pending queries:', error);
+    }
+    
+    // Close database connection only after all queries are done
+    database.end((err) => {
+      if (err) {
+        console.error('Error closing database connection:', err);
+      }
+    });
+    
+  // res.send(`Processo finalizado!`);
+  res.status(200).json({message: 'Processo finalizado', status: 200});  
 }
 
 }
