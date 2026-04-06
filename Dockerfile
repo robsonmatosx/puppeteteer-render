@@ -7,4 +7,8 @@ COPY package*.json ./
 
 RUN npm ci
 COPY . .
+
+USER root
+RUN chmod -R 777 /usr/src/app
+
 CMD ["node","index.js" ]

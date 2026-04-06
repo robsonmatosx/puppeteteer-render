@@ -13,6 +13,7 @@ const {getValue} =require("./getValue");
 const {chatBot} =require("./chatBot");
 const {scrapeUrl} =require("./scrapeurl");
 const {scrapeML} =require("./scrapeml");
+const {scrapeFindLoja} =require("./scrapeFindLoja");
 
 // var cookieParser = require('cookie-parser');
 var session      = require('express-session');
@@ -128,6 +129,16 @@ app.post('/scrapeurl', (req, res) => {
     
 });
 
+app.post('/findloja', (req, res) => {
+    // Access the POST data here
+    const userData = req.body; 
+    console.log(userData);
+    //  res.render('./scrape', {
+    //     msg:userData
+    // });
+    scrapeFindLoja(userData, res);
+    
+});
 
 app.get("/scrapeml", (req,res)=> {
     res.send("scrapeml endpoint is working");

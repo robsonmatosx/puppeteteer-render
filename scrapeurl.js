@@ -198,14 +198,24 @@ try {
 
               var texto = produto[index].toLowerCase();
               // Lógica de grupos:
-              const temConvite = texto.includes('convite')|| texto.includes('arte') || 
-                    texto.includes('kit') || texto.includes('save the date');
-              const temDigitalOuVirtual = texto.includes('digital') || texto.includes('virtual') || texto.includes('animado') ||
-              texto.includes('interativo') || texto.includes('caneca') ;
+              // 1. Crie uma versão minúscula para fazer as comparações
+              let textoMinusculo = texto.toLowerCase();
+
+              // 2. Use a versão minúscula (textoMinusculo) para o .includes()
+              let temConvite = textoMinusculo.includes('convite') || 
+                              textoMinusculo.includes('arte') || 
+                              textoMinusculo.includes('kit') || 
+                              textoMinusculo.includes('save the date');
+
+              const temDigitalOuVirtual = textoMinusculo.includes('digital') || 
+                                          textoMinusculo.includes('virtual') || 
+                                          textoMinusculo.includes('animado') ||
+                                          textoMinusculo.includes('interativo') || 
+                                          textoMinusculo.includes('caneca');
                 
             //  if (produto[index].toLowerCase().search('convite digital')>=0 || produto[index].toLowerCase().indexOf('convite virtual')>=0 || produto[index].toLowerCase().indexOf('convite individual')>=0 || produto[index].toLowerCase().indexOf('arte digital')>=0 || produto[index].toLowerCase().search('convite animado')>=0){
            
-            if ((temConvite && temDigitalOuVirtual)) {
+            if (temConvite && temDigitalOuVirtual) {
               const produtoArray = produto[index].split("-");
               var codigo_produto = produto_id[index].split('/');
             
